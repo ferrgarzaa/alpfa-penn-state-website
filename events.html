@@ -6,6 +6,135 @@
 <title>Events | ALPFA Penn State</title>
 <link rel="icon" href="images/alpfa-logo.png" />
 <link rel="stylesheet" href="css/style.css" />
+<style>
+  /* ── Event accordion ── */
+  .event-list { margin-top: 48px; border: 1px solid var(--border); }
+
+  .event-row {
+    border-bottom: 1px solid var(--border);
+  }
+  .event-row:last-child { border-bottom: none; }
+
+  .event-trigger {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: center;
+    gap: 0;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    padding: 0;
+  }
+  .event-trigger:hover { background: var(--light); }
+  .event-trigger.open   { background: var(--light); }
+
+  .event-trigger .cal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px;
+    background: var(--dark);
+    color: #fff;
+    height: 100%;
+    min-width: 120px;
+  }
+  .event-trigger .cal .mo {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 2px;
+  }
+  .event-trigger .cal .dy {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  .event-trigger .cal .yr {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+  }
+
+  .event-trigger .info {
+    padding: 24px 32px;
+  }
+  .event-trigger .info .etag {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .event-trigger .info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  .event-trigger .info .emeta {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .event-trigger .info .emeta span { margin-right: 20px; }
+
+  .event-trigger .arrow {
+    padding: 0 32px;
+    font-size: 1.1rem;
+    color: var(--muted);
+    transition: transform 0.25s;
+    font-family: sans-serif;
+    flex-shrink: 0;
+  }
+  .event-trigger.open .arrow { transform: rotate(180deg); }
+
+  /* expandable body */
+  .event-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    background: var(--light);
+    border-top: 1px solid var(--border);
+  }
+  .event-details.open { max-height: 800px; }
+
+  .event-details-inner {
+    padding: 36px 40px 36px 152px; /* indent to align with text column */
+  }
+
+  .event-details-inner p { font-size: 0.97rem; color: var(--muted); line-height: 1.8; max-width: 620px; margin-bottom: 8px; }
+  .event-details-inner h4 { font-size: 0.97rem; font-weight: 700; color: var(--ink); margin: 28px 0 12px; letter-spacing: -0.2px; }
+  .event-details-inner ul { padding-left: 20px; color: var(--muted); font-size: 0.93rem; }
+  .event-details-inner li { margin-bottom: 6px; }
+
+  .timeline { border-top: 1px solid var(--border); }
+  .timeline-item { display: grid; grid-template-columns: 48px 1fr; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--border); align-items: start; }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-item .timeline-num { font-family: -apple-system, "Segoe UI", sans-serif; font-size: 0.7rem; font-weight: 700; color: var(--red); letter-spacing: 1px; padding-top: 3px; }
+  .timeline-item h5 { font-size: 0.93rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+  .timeline-item p  { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+  @media (max-width: 700px) {
+    .event-trigger { grid-template-columns: 90px 1fr auto; }
+    .event-trigger .cal { min-width: 90px; padding: 20px 12px; }
+    .event-trigger .cal .dy { font-size: 1.8rem; }
+    .event-details-inner { padding: 28px 24px; }
+    .event-trigger .info { padding: 18px 20px; }
+    .event-trigger .arrow { padding: 0 16px; }
+  }
+</style>
 </head>
 <body>
 
@@ -13,7 +142,10 @@
   <div class="container">
     <a class="nav-brand" href="index.html">
       <img src="images/alpfa-logo.png" alt="ALPFA logo" />
-      <span>ALPFA PENN STATE</span>
+      <div class="wordmark">
+        ALPFA Penn State
+        <small>Smeal College of Business</small>
+      </div>
     </a>
     <button class="nav-toggle" aria-label="Toggle navigation">&#9776;</button>
     <ul class="nav-links">
@@ -25,106 +157,125 @@
   </div>
 </header>
 
-<section class="hero" style="padding: 70px 0 60px;">
+<div class="hero-strip">
   <div class="container">
-    <div class="hero-eyebrow">What's Happening</div>
-    <h1 style="font-size: clamp(2.2rem, 6vw, 3.6rem);">Events</h1>
-    <p class="lead">Networking, professional development, and community — all year long.</p>
+    <div class="eyebrow">What's Happening</div>
+    <h1>Events</h1>
+    <p>Networking, professional development, and community &mdash; all year long.</p>
   </div>
-</section>
+</div>
 
 <section>
   <div class="container">
-    <div class="eyebrow">Flagship Event</div>
-    <h2 class="section-title">The Masquerade Ball 2026</h2>
-    <p class="section-text">
-      A different kind of networking evening. The Masquerade is a formal dinner and networking
-      event centered on diversity leadership — our chapter's biggest event of the year.
-    </p>
+    <div class="eyebrow">2026 Schedule</div>
+    <h2 class="section-title">Upcoming Events</h2>
+    <p class="section-text">Click any event to see full details.</p>
 
-    <div class="event-card">
-      <div class="calendar-strip">
-        <div class="date-badge">
-          <div class="month">September</div>
-          <div class="day">30</div>
-          <div class="year">2026</div>
-        </div>
-        <div class="calendar-header">
-          <h3>Masquerade Ball</h3>
-          <div class="meta-row">
-            <span>4:00 PM &ndash; 9:00 PM</span>
-            <span>Smeal College of Business Atrium, 220 Business Building</span>
+    <div class="event-list">
+
+      <!-- EVENT 1: Masquerade Ball -->
+      <div class="event-row">
+        <button class="event-trigger" aria-expanded="false">
+          <div class="cal">
+            <div class="mo">Sep</div>
+            <div class="dy">30</div>
+            <div class="yr">2026</div>
+          </div>
+          <div class="info">
+            <div class="etag">Flagship Event</div>
+            <h3>The Masquerade Ball 2026</h3>
+            <div class="emeta">
+              <span>4:00 &ndash; 9:00 PM</span>
+              <span>Smeal College of Business Atrium</span>
+            </div>
+          </div>
+          <div class="arrow">&#8964;</div>
+        </button>
+        <div class="event-details">
+          <div class="event-details-inner">
+            <p>
+              What makes the Masquerade unique is its format. During the dinner and networking
+              portion of the event, all attendees &mdash; including recruiters and company
+              representatives &mdash; wear masks. This encourages open, authentic, and unbiased
+              conversation between students and professionals before identities are known.
+              After the reveal, the event transitions into a standard career-fair-style networking session.
+            </p>
+
+            <h4>How the Evening Unfolds</h4>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-num">01</div>
+                <div><h5>Masked Dinner</h5><p>Companies are known to attendees, but individual identities stay hidden.</p></div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-num">02</div>
+                <div><h5>Grand Reveal</h5><p>Masks come off at the conclusion of dinner.</p></div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-num">03</div>
+                <div><h5>Career Fair Networking</h5><p>Open networking session, one-on-one with recruiters.</p></div>
+              </div>
+            </div>
+
+            <h4>Who Attends</h4>
+            <ul>
+              <li>Students across Accounting, Finance, Management, Marketing, Business Analytics, Supply Chain, and more.</li>
+              <li>Recruiters and representatives from our corporate partners.</li>
+              <li>ALPFA Penn State members and allied student organizations.</li>
+            </ul>
           </div>
         </div>
       </div>
-      <div class="event-body">
-        <p>
-          What makes the Masquerade unique is its format. During the dinner and networking
-          portion of the event, all attendees — including recruiters and company
-          representatives — wear masks. This encourages open, authentic, and unbiased
-          conversation between students and professionals before identities are known.
-          Attendees are asked to avoid clothing or accessories with visible company logos during
-          the masked portion. After the reveal, the event transitions into a standard
-          career-fair-style networking session.
-        </p>
+      <!-- /EVENT 1 -->
 
-        <h4>How the Evening Unfolds</h4>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-num">01</div>
-            <div>
-              <h5>Masked Dinner</h5>
-              <p>Companies are known to attendees, but individual identities stay hidden.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-num">02</div>
-            <div>
-              <h5>Grand Reveal</h5>
-              <p>Masks come off at the conclusion of dinner.</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-num">03</div>
-            <div>
-              <h5>Career Fair</h5>
-              <p>Open networking session, one-on-one with recruiters.</p>
-            </div>
-          </div>
-        </div>
-
-        <h4>Who Attends</h4>
-        <ul>
-          <li>Students across Accounting, Finance, Management, Marketing, Business Analytics, Supply Chain Management, Data Analysis, and more.</li>
-          <li>Recruiters and representatives from our corporate partners.</li>
-          <li>ALPFA Penn State members and allied student organizations.</li>
-        </ul>
+      <!-- More events coming soon row -->
+      <div class="event-row" style="padding: 28px 40px; color: var(--muted); font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 0.88rem; background: #fff;">
+        More events &mdash; workshops, socials, and professional development sessions &mdash; will be posted here throughout the semester.
       </div>
-    </div>
 
-    <div class="coming-soon">
-      More events — workshops, socials, and professional development sessions — will be posted
-      here throughout the semester. Check back soon!
     </div>
   </div>
 </section>
 
 <div class="cta-banner">
   <div class="container">
-    <h2>Want to Get Involved?</h2>
-    <p>Reach out to learn more about upcoming events and how to participate.</p>
-    <a href="contact.html" class="btn" style="background:#fff; color:var(--alpfa-red);">Contact Us</a>
+    <div>
+      <h2>Want to get involved?</h2>
+      <p>Reach out to learn more about upcoming events and how to participate.</p>
+    </div>
+    <a href="contact.html" class="btn">Contact Us</a>
   </div>
 </div>
 
 <footer>
   <div class="container">
     <div class="footer-brand">ALPFA Penn State</div>
-    <p>Smeal College of Business &middot; University Park, PA 16802</p>
-    <p>&copy; 2026 ALPFA Penn State. All Rights Reserved.</p>
+    <p>Smeal College of Business &middot; University Park, PA 16802 &nbsp;&middot;&nbsp; &copy; 2026 ALPFA Penn State. All Rights Reserved.</p>
   </div>
 </footer>
 
 <script src="js/script.js"></script>
+<script>
+  document.querySelectorAll('.event-trigger').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var details = this.nextElementSibling;
+      var isOpen  = details.classList.contains('open');
+
+      // close all
+      document.querySelectorAll('.event-details').forEach(function(d) { d.classList.remove('open'); });
+      document.querySelectorAll('.event-trigger').forEach(function(b) {
+        b.classList.remove('open');
+        b.setAttribute('aria-expanded', 'false');
+      });
+
+      // open this one if it was closed
+      if (!isOpen) {
+        details.classList.add('open');
+        this.classList.add('open');
+        this.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
 </body>
 </html>
