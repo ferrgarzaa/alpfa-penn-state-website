@@ -579,7 +579,20 @@ p.section-text,
   margin-bottom: 20px;
 }
 .contact-card p { font-size: 0.93rem; color: var(--muted); margin: 6px 0; }
-.contact-card a { color: var(--blue); }
+.contact-btn {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dark);
+  border-bottom: 1px solid var(--dark);
+  padding-bottom: 2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.contact-btn:hover { color: var(--red); border-color: var(--red); }
 
 .social-row { display: flex; gap: 14px; margin-top: 40px; }
 .social-pill {
